@@ -81,7 +81,6 @@ if target_sentence:
         clean_target = clean_text(target_sentence)
         t_ipa_display = ipa.convert(clean_target)
         
-        # --- FIXED REFERENCE BOX STYLING ---
         st.markdown(
             f"""
             <div style='
@@ -118,9 +117,6 @@ if target_sentence:
             
             st.write("**Phonetic Comparison (Red = Incorrect/Extra):**")
             
-            # --- FIXED BOX STYLING ---
-            # background-color: #1E1E1E (Dark background)
-            # color: #FFFFFF (White text)
             st.markdown(
                 f"""
                 <div style='
@@ -152,3 +148,4 @@ if target_sentence:
             
     elif sentence_changed:
         st.info("New sentence detected. Please record your voice for the new target!")
+

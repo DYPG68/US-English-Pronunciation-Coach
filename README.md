@@ -37,6 +37,15 @@ This project solves the challenge of **Phonetic Alignment**. Most speech-to-text
 
 ---
 
+## 🚀 Live Demo
+Try the app right now! No installation needed.
+
+🔗 **Live Version:** [https://](https://)
+
+(Hosted for free on Streamlit Community Cloud)
+
+---
+
 ## 📦 Installation & Setup
 
 1. ### Install FFmpeg (Required)
@@ -65,5 +74,5 @@ This project solves the challenge of **Phonetic Alignment**. Most speech-to-text
 ---
 
 ## 📄 License
-Distributed under the MIT License. See [LICENSE](ai-pronunciation-coach) for details.
+Distributed under the MIT License. See [LICENSE](https://github.com/DYPG68/ai-pronunciation-coach/blob/main/LICENSE) for details.
 

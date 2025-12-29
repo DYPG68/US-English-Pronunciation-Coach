@@ -21,38 +21,37 @@ def clean_text(text):
     return re.sub(r'[^\w\s]', '', text).lower().strip()
 
 def get_highlighted_ipa(target_ipa, user_ipa):
-    """Compares two IPA strings and highlights the user's mistakes in red."""
+    """
+    Compares two IPA strings and highlights the user's mistakes in red.
+    Target: The correct sequence
+    User: What the user actually said
+    """
     result = ""
     # SequenceMatcher finds the differences between the two strings
     matcher = difflib.SequenceMatcher(None, target_ipa, user_ipa)
     
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
         if tag == 'equal':
-            # Matching parts are displayed normally
+            # Matching parts are normal
             result += user_ipa[j1:j2]
         elif tag in ('replace', 'insert'):
             # Mistaken or extra sounds are highlighted in red
-            result += f'<span style="color:red; font-weight:bold;">{user_ipa[j1:j2]}</span>'
+            result += f'<span style="color:#FF4B4B; font-weight:bold;">{user_ipa[j1:j2]}</span>'
         elif tag == 'delete':
             # Missing sounds are indicated with a red placeholder
-            result += '<span style="color:red; font-weight:bold;">_</span>'
+            result += '<span style="color:#FF4B4B; font-weight:bold;">_</span>'
             
     return result
 
 def get_phonetic_feedback(target_text, user_audio_path):
-    # 1. Transcribe User Audio
     result = model.transcribe(user_audio_path)
     user_text = clean_text(result['text'])
     
-    # 2. Convert to IPA
     target_clean = clean_text(target_text)
     target_ipa = ipa.convert(target_clean)
     user_ipa = ipa.convert(user_text)
     
-    # 3. Calculate Score
     score = int(difflib.SequenceMatcher(None, target_ipa, user_ipa).ratio() * 100)
-    
-    # 4. Generate highlighted version of User IPA
     highlighted_user_ipa = get_highlighted_ipa(target_ipa, user_ipa)
     
     return user_text, target_ipa, highlighted_user_ipa, score
@@ -64,8 +63,6 @@ if 'current_sentence' not in st.session_state:
     st.session_state.current_sentence = ""
 
 target_sentence = st.text_input("Target Sentence:", "The quick brown fox jumps over the lazy dog.")
-
-# Check if the sentence has changed
 sentence_changed = target_sentence != st.session_state.current_sentence
 
 if target_sentence:
@@ -80,8 +77,28 @@ if target_sentence:
     with col1:
         st.subheader("1. Reference")
         st.audio(audio_fp, format="audio/mp3")
+        
         clean_target = clean_text(target_sentence)
-        st.info(f"Target IPA: `{ipa.convert(clean_target)}`")
+        t_ipa_display = ipa.convert(clean_target)
+        
+        # --- FIXED REFERENCE BOX STYLING ---
+        st.markdown(
+            f"""
+            <div style='
+                font-family: "Courier New", Courier, monospace; 
+                background-color: #1E1E1E; 
+                color: #FFFFFF; 
+                padding: 15px; 
+                border-radius: 10px;
+                border: 1px solid #4B4B4B;
+                margin-top: 5px;
+            '>
+                <span style='color: #888888; font-size: 0.8em;'>Target IPA:</span><br>
+                {t_ipa_display}
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
 
     # 2. User Recording
     with col2:
@@ -99,20 +116,36 @@ if target_sentence:
             st.divider()
             st.header(f"Score: {score}/100")
             
-            # Displaying Comparison
-            st.write("**Phonetic Feedback (Red = Mistake):**")
-            st.markdown(f"Target: `{t_ipa}`")
-            # We use unsafe_allow_html to show the red color tags
-            st.markdown(f"Yours: &nbsp; `{h_u_ipa}`", unsafe_allow_html=True)
+            st.write("**Phonetic Comparison (Red = Incorrect/Extra):**")
+            
+            # --- FIXED BOX STYLING ---
+            # background-color: #1E1E1E (Dark background)
+            # color: #FFFFFF (White text)
+            st.markdown(
+                f"""
+                <div style='
+                    font-family: "Courier New", Courier, monospace; 
+                    line-height: 2.2; 
+                    background-color: #1E1E1E; 
+                    color: #FFFFFF; 
+                    padding: 20px; 
+                    border-radius: 10px;
+                    border: 1px solid #4B4B4B;
+                    font-size: 1.1em;
+                '>
+                    <span style='color: #888888;'>Target:</span> {t_ipa}<br>
+                    <span style='color: #888888;'>Yours:</span>&nbsp; {h_u_ipa}
+                </div>
+                """, 
+                unsafe_allow_html=True
+            )
             
             st.write(f"**I heard:** \"{heard_text}\"")
             
             if score > 85:
                 st.success("Excellent! Almost native.")
-            elif score > 60:
-                st.warning("Good, but notice the red highlights.")
             else:
-                st.error("Keep practicing. Try to match the target sounds exactly.")
+                st.warning("Take a look at the red sounds to improve.")
 
         if os.path.exists("temp_audio.wav"):
             os.remove("temp_audio.wav")

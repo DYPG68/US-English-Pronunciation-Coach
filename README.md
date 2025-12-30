@@ -40,7 +40,7 @@ This project solves the challenge of **Phonetic Alignment**. Most speech-to-text
 ## 🚀 Live Demo
 Try the app right now! No installation needed.
 
-🔗 **Live Version:** [https://](https://)
+🔗 **Live Version:** [https://ai-pronunciation-coach-9iqr7mscarp2fxrdsfx5ue.streamlit.app](https://ai-pronunciation-coach-9iqr7mscarp2fxrdsfx5ue.streamlit.app)
 
 (Hosted for free on Streamlit Community Cloud)
 
